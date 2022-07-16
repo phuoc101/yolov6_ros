@@ -1,0 +1,6 @@
+<launch>
+    <!-- Yolov6 NODE -->
+    <node pkg="yolov6_ros" name="detect" type="detect.py">
+    </node>
+
+</launch>
