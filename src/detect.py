@@ -16,7 +16,7 @@ from rostopic import get_topic_type
 from sensor_msgs.msg import Image, CompressedImage
 from detection_msgs.msg import BoundingBox, BoundingBoxes
 
-# add yolov5 submodule to path
+# add yolov6 submodule to path
 ABS_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = osp.join(ABS_DIR, 'yolov6')
 if str(ROOT) not in sys.path:
@@ -27,13 +27,12 @@ from yolov6.core.inferer import Inferer
 @torch.no_grad()
 class Yolov6Detector:
     def __init__(self):
-        self.conf_thres = rospy.get_param("~confidence_threshold", 0.25)
-        self.iou_thres = rospy.get_param("~iou_threshold", 0.45)
+        self.conf_thres = rospy.get_param("~conf_thresh", 0.25)
+        self.iou_thres = rospy.get_param("~iou_thresh", 0.45)
         self.agnostic_nms = rospy.get_param("~agnostic_nms", False)
         self.max_det = rospy.get_param("~maximum_detections", 1000)
         self.classes = rospy.get_param("~classes", None)
         self.half = rospy.get_param("~half", False)
-        self.view_image = rospy.get_param("~view_image", True)
         self.yaml = rospy.get_param("~yaml", osp.join(ROOT, 'data/coco.yaml'))
         self.img_size = rospy.get_param("~img_size", 640)
         self.hide_conf = rospy.get_param("~hide_conf", False)
@@ -42,6 +41,7 @@ class Yolov6Detector:
         # Initialize weights
         self.weights = osp.join(ROOT, rospy.get_param(
             "~weights", 'weights/yolov6n.pt'))
+        print(self.weights)
         # Initialize model
         self.device = rospy.get_param("~device", "gpu")
         self.inferer = Inferer(self.weights, self.device,
@@ -60,8 +60,9 @@ class Yolov6Detector:
             self.img_sub = rospy.Subscriber(
                 self.img_topic, Image, self.img_cb, queue_size=1
             )
+        self.output_topic = rospy.get_param("~output_topic", 'yolo/detections')
         self.bounding_boxes_pub = rospy.Publisher(
-            rospy.get_param("~output_topic", 'yolo/detections'), BoundingBoxes, queue_size=10
+            self.output_topic, BoundingBoxes, queue_size=10
         )
         # Initialize CV_Bridge
         self.bridge = CvBridge()
@@ -107,13 +108,15 @@ class Yolov6Detector:
             cv2.waitKey(1)
 
     def summary(self):
-        return f"Yolov6 Detector summary:\n \
-                Weights: {self.weights}\n \
-                Confidence Threshold: {self.conf_thres}\n \
-                IOU Threshold: {self.iou_thres}\n \
-                Class-agnostic NMS: {self.agnostic_nms}\n \
-                Maximal detections per image: {self.max_det}\n \
-                Data yaml file: {self.yaml}"
+        return f"\n\N{rocket}\N{rocket}\N{rocket} Yolov6 Detector summary:\n" \
+                + f"Weights: {self.weights}\n" \
+                + f"Confidence Threshold: {self.conf_thres}\n" \
+                + f"IOU Threshold: {self.iou_thres}\n" \
+                + f"Class-agnostic NMS: {self.agnostic_nms}\n" \
+                + f"Maximal detections per image: {self.max_det}\n" \
+                + f"Data yaml file: {self.yaml}\n"\
+                + f"Input topic: {self.img_topic}\n"\
+                + f"Output topic: {self.output_topic}"
 
 
 def main():

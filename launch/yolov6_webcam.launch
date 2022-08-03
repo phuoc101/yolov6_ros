@@ -1,6 +1,7 @@
 <launch>
     <!-- Yolov6 NODE -->
-    <node pkg="yolov6_ros" name="detect" type="detect.py">
+    <node pkg="yolov6_ros" name="detect" type="detect.py" output="screen">
+        <param name="weights"               value="weights/yolov6n.pt"/>
     </node>
 
     <node pkg="usb_cam" name="usb_cam" type="usb_cam_node" >
