@@ -33,7 +33,7 @@ class Yolov6Detector:
         self.max_det = rospy.get_param("~maximum_detections", 1000)
         self.classes = rospy.get_param("~classes", None)
         self.half = rospy.get_param("~half", False)
-        self.yaml = rospy.get_param("~yaml", osp.join(ROOT, 'data/coco.yaml'))
+        self.yaml = osp.join(ROOT, rospy.get_param("~yaml", 'data/coco.yaml'))
         self.img_size = rospy.get_param("~img_size", 640)
         self.hide_conf = rospy.get_param("~hide_conf", False)
         self.hide_labels = rospy.get_param("~hide_labels", False)
