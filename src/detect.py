@@ -60,9 +60,13 @@ class Yolov6Detector:
             self.img_sub = rospy.Subscriber(
                 self.img_topic, Image, self.img_cb, queue_size=1
             )
-        self.output_topic = rospy.get_param("~output_topic", 'yolo/detections')
+        self.output_topic = rospy.get_param("~output_topic", 'yolov6/detections')
         self.bounding_boxes_pub = rospy.Publisher(
             self.output_topic, BoundingBoxes, queue_size=10
+        )
+        self.output_img_topic = rospy.get_param("~output_img_topic", 'yolov6/detection_image')
+        self.output_img_pub = rospy.Publisher(
+            self.output_img_topic, Image, queue_size=10
         )
         # Initialize CV_Bridge
         self.bridge = CvBridge()
@@ -81,9 +85,9 @@ class Yolov6Detector:
                                   self.agnostic_nms, self.max_det, False, False, False, False)
         img_ori = img_src
 
-        bounding_boxes = BoundingBoxes()
-        bounding_boxes.header = msg.header
-        bounding_boxes.image_header = msg.header
+        bounding_boxes_msg = BoundingBoxes()
+        bounding_boxes_msg.header = msg.header
+        bounding_boxes_msg.image_header = msg.header
 
         if len(det):
             for *xyxy, conf, cls in reversed(det):
@@ -100,15 +104,18 @@ class Yolov6Detector:
                 bounding_box.xmax = int(xyxy[2])
                 bounding_box.ymax = int(xyxy[3])
                 
-                bounding_boxes.bounding_boxes.append(bounding_box)
-        self.bounding_boxes_pub.publish(bounding_boxes)
+                bounding_boxes_msg.bounding_boxes.append(bounding_box)
+        img_msg = self.bridge.cv2_to_imgmsg(img_src, encoding="bgr8")
+        img_msg.header = bounding_boxes_msg.header
+        self.bounding_boxes_pub.publish(bounding_boxes_msg)
+        self.output_img_pub.publish(img_msg)
 
         if self.show_img:
             cv2.imshow('yolov6', img_src)
             cv2.waitKey(1)
 
     def summary(self):
-        return f"\n\N{rocket}\N{rocket}\N{rocket} Yolov6 Detector summary:\n" \
+        return f"\N{rocket}\N{rocket}\N{rocket} Yolov6 Detector summary:\n" \
                 + f"Weights: {self.weights}\n" \
                 + f"Confidence Threshold: {self.conf_thres}\n" \
                 + f"IOU Threshold: {self.iou_thres}\n" \
