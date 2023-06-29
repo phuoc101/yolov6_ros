@@ -1,7 +1,24 @@
 <launch>
     <!-- Yolov6 NODE -->
+    <arg name="conf_thresh"              default="0.7"/>
+    <arg name="iou_thresh"               default="0.45"/>
+    <arg name="agnostic_nms"             default="false"/>
+    <arg name="show_image"               default="true"/>
+    <arg name="output_topic"             default="yolov6/detections"/>
+    <arg name="output_img_topic"         default="yolov6/detection_image"/>
+    <arg name="yaml"                     default="data/coco.yaml"/>
+    <arg name="img_size"                 default="640"/>
+    <arg name="weights"                  default="weights/yolov6s.pt"/>
     <node pkg="yolov6_ros" name="detect" type="detect.py" output="screen">
-        <param name="weights"               value="weights/yolov6n.pt"/>
+        <param name="conf_thresh"        value="$(arg conf_thresh)"/>
+        <param name="iou_thresh"         value="$(arg iou_thresh)"/>
+        <param name="agnostic_nms"       value="$(arg agnostic_nms)"/>
+        <param name="show_image"         value="$(arg show_image)"/>
+        <param name="yaml"               value="$(arg yaml)"/>
+        <param name="img_size"           value="$(arg img_size)"/>
+        <param name="weights"            value="$(arg weights)"/>
+        <param name="output_topic"       value="$(arg output_topic)"/>
+        <param name="output_img_topic"   value="$(arg output_img_topic)"/>
     </node>
 
     <node pkg="usb_cam" name="usb_cam" type="usb_cam_node" >
