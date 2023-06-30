@@ -6,7 +6,9 @@ Built and tested on Python3.8, Ubuntu 20.04, ROS Noetic.
 Clone the official yolov6 repo into src directory and swap the file `yolov6/core/inferer.py` with `src/inferer.py`:
 
 ```bash
-git clone https://github.com/meituan/YOLOv6.git
+cd <yolov6_ros_directory>/src
+git clone https://github.com/meituan/YOLOv6.git yolov6
+git checkout 0.2.0  # Tested version works on this release only 
 ```
 
 Clone the `detection_msgs` package: `https://github.com/phuoc101/detection_msgs.git`
@@ -14,7 +16,7 @@ Clone the `detection_msgs` package: `https://github.com/phuoc101/detection_msgs.
 *Note*: Please set up a ROS virtual environment with Pytorch and source it before running the package, for examnple:
 ```bash
 virtualenv --system-site-packages -p python3.8 ~/ros_torch_env
-## install dependencies in the environment base on yolov7's requirements.txt
+## install dependencies in the environment base on yolov6's requirements.txt
 ```
 
 To build the package:
