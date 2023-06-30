@@ -3,13 +3,14 @@
 Built and tested on Python3.8, Ubuntu 20.04, ROS Noetic.
 
 ## 🧰 Build
-Clone the official yolov6 repo into src directory and swap the file `yolov6/core/inferer.py` with `src/inferer.py`:
+Clone the official yolov6 repo into src directory :
 
 ```bash
 cd <yolov6_ros_directory>/src
 git clone https://github.com/meituan/YOLOv6.git yolov6
 git checkout 0.2.0  # Tested version works on this release only 
 ```
+Swap the file `yolov6/core/inferer.py` with `src/inferer.py`
 
 Clone the `detection_msgs` package: `https://github.com/phuoc101/detection_msgs.git`
 
